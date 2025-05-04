@@ -15,6 +15,42 @@ class RecipeManager:
     def __init__(self, filename="recipes.json"):
         self.recipes = []
         self.filename = filename
+        self.load_recipes()  # Load existing data on start
+
+    def add_recipe(self, recipe):
+        self.recipes.append(recipe)
+        self.save_recipes()
+
+    def save_recipes(self):
+        data = []
+        for r in self.recipes:
+            data.append({
+                "name": r.name,
+                "ingredients": r.ingredients,
+                "instructions": r.instructions,
+                "category": r.category
+            })
+        with open(self.filename, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    def load_recipes(self):
+        if not os.path.exists(self.filename):
+            return
+        with open(self.filename, 'r') as f:
+            data = json.load(f)
+            for r in data:
+                recipe = Recipe(r["name"], r["ingredients"], r["instructions"], r["category"])
+                self.recipes.append(recipe)
+
+    def find_recipe(self, recipe_name):
+        for recipe in self.recipes:
+            if recipe.name.lower() == recipe_name.lower():
+                return recipe
+        return None
+
+    def __init__(self, filename="recipes.json"):
+        self.recipes = []
+        self.filename = filename
         self.load_recipes()
 
     def add_recipe(self, recipe):
@@ -214,6 +250,8 @@ delete_button.grid(row=2, column=0, padx=10)
 quit_button = tk.Button(frame, text="Quit", command=root.destroy, width=10)
 quit_button.grid(row=2, column=1, padx=10)
 
+update_recipe_list()
 root.mainloop()
+
 
 # The .mainloop() method is the main event loop of the Tkinter application. It keeps the window open and waits for user interaction. When the user interacts with the GUI (like clicking buttons), the corresponding functions are called to handle those events.
