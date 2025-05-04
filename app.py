@@ -69,6 +69,41 @@ def display_recipe_gui():
 
     messagebox.showinfo("Recipe Details", info)
 
+def edit_recipe_gui():
+    selected = listbox.curselection()
+    if not selected:
+        messagebox.showerror("Error", "Please select a recipe to edit.")
+        return
+
+    index = selected[0]
+    recipe = manager.recipes[index]
+
+    # Prompt for new values (pre-fill with current values)
+    new_name = simpledialog.askstring("Edit Recipe Name", "Enter the new recipe name:", initialvalue=recipe.name)
+    if not new_name:
+        return
+
+    new_ingredients_input = simpledialog.askstring("Edit Ingredients", "Enter ingredients (comma-separated):", initialvalue=", ".join(recipe.ingredients))
+    if not new_ingredients_input:
+        return
+    new_ingredients = [ing.strip() for ing in new_ingredients_input.split(",")]
+
+    new_instructions = []
+    messagebox.showinfo("Edit Instructions", "Enter each instruction step one by one. Type 'end' to finish.")
+    while True:
+        step = simpledialog.askstring("Instruction Step", "Enter instruction step (or type 'end' to finish):")
+        if step is None or step.lower() == 'end':
+            break
+        new_instructions.append(step.strip())
+
+    # Update the recipe object
+    recipe.name = new_name
+    recipe.ingredients = new_ingredients
+    recipe.instructions = new_instructions
+
+    update_recipe_list()
+    messagebox.showinfo("Success", f"Recipe '{new_name}' updated successfully!")
+
 
 def update_recipe_list():
     listbox.delete(0, tk.END) 
@@ -78,7 +113,7 @@ def update_recipe_list():
 # Main GUI window
 root = tk.Tk()
 root.title("SIAF Recipe Manager")
-root.geometry("400x400")
+root.geometry("500x400")
 # root is the main window of the Tkinter application. It serves as the container for all other widgets.
 
 
@@ -86,11 +121,14 @@ frame = tk.Frame(root)
 frame.pack(pady=10)
 # frame is a container widget that can hold other widgets. It helps in organizing the layout of the GUI.
 
-add_button = tk.Button(frame, text="Add Recipe", command=add_recipe_gui, width=15)
+add_button = tk.Button(frame, text="Add Recipe", command=add_recipe_gui, width=10)
 add_button.grid(row=0, column=0, padx=10)
 
-display_button = tk.Button(frame, text="Display Recipe", command=display_recipe_gui, width=15)
+display_button = tk.Button(frame, text="Display Recipe", command=display_recipe_gui, width=10)
 display_button.grid(row=0, column=1, padx=10)
+
+edit_button = tk.Button(frame, text="Edit Recipe", command=edit_recipe_gui, width=10)
+edit_button.grid(row=0, column=2, padx=10)
 
 listbox = tk.Listbox(root, width=50)
 listbox.pack(pady=20)
